@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        #warpBox {
+            width: 400px;
+            height: 300px;
+            overflow: hidden;
+            margin: 50px auto;
+            position: relative;
+        }
+
+        #ulImgBox {
+            width: 999999px;
+            margin-left: 0;;
+        }
+
+        #ulImgBox li {
+            float: left;
+        }
+
+        #ulPointBox {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            margin-left: -40px;
+            width: 80px;
+            z-index: 9;
+        }
+
+        #ulPointBox li {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            float: left;
+            margin: 0 5px;
+            background: #fff;
+            cursor: pointer;
+        }
+
+        #ulPointBox li.active {
+            background: #e90000;
+        }
+
+        #prev {
+            font-size: 40px;
+            font-weight: bold;
+            position: absolute;
+            top: 50%;
+            left: 10px;
+            margin-top: -10px;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        #next {
+            font-size: 40px;
+            font-weight: bold;
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            margin-top: -10px;
+            color: #fff;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<div id="warpBox">
+    <ul id="ulImgBox">
+        <li><img src="img/01.jpg"></li>
+        <li><img src="img/03.jpg"></li>
+        <li><img src="img/04.jpg"></li>
+        <li><img src="img/05.jpg"></li>
+    </ul>
+    <span id="prev"><</span>
+    <span id="next">></span>
+    <ul id="ulPointBox">
+        <li class="active"></li>
+        <li></li>
+        <li></li>
+        <li></li>
+    </ul>
+</div>
+</body>
+</html>
+<script>
+    var time;
+    var div = document.getElementById('warpBox');
+    var ul = document.getElementById('ulImgBox');
+    var liList = ul.getElementsByTagName('li');
+    var prev = document.getElementById('prev');
+    var next = document.getElementById('next');
+    var liIndex = -1;
+    var liLength = liList.length;
+    var divWidth = div.offsetWidth;
+    var pointUl = document.getElementById('ulPointBox');
+    var pointLi = pointUl.getElementsByTagName('li');
+    var pointLength = pointLi.length;
+
+    var Carousel = {
+        init: function () {
+            Carousel.Broadcast();
+            Carousel.stopAnime(ul);
+            Carousel.stopAnime(prev);
+            Carousel.stopAnime(next);
+            Carousel.stopAnime(pointUl);
+            Carousel.statAnime(ul);
+            Carousel.statAnime(prev);
+            Carousel.statAnime(next);
+            Carousel.statAnime(pointUl);
+            Carousel.preClick();
+            Carousel.nextClick();
+            Carousel.point();
+            time = setInterval(Carousel.Broadcast, 2000);
+        },
+        Broadcast: function () {
+            if (liIndex < liLength - 1) {
+                liIndex++;
+                ul.style.marginLeft = -liIndex * divWidth + 'px';
+                Carousel.pointFocus();
+            } else {
+                liIndex = 0;
+                ul.style.marginLeft = '0px'
+                Carousel.pointFocus();
+            }
+        },
+        stopAnime: function (el) {
+            el.onmouseover = function () {
+                clearInterval(time)
+                n = 1;
+            }
+        },
+        statAnime: function (el) {
+            el.onmouseout = function () {
+                time = setInterval(Carousel.Broadcast, 2000);
+            }
+        },
+        preClick: function () {
+            prev.onclick = function () {
+                if (liIndex == 0) {
+                    ul.style.marginLeft = -(liLength - 1) * divWidth + 'px';
+                    liIndex = liLength - 1;
+                    Carousel.pointFocus();
+                } else {
+
+                    ul.style.marginLeft = -(liIndex - 1) * divWidth + 'px';
+                    liIndex--;
+                    Carousel.pointFocus();
+                }
+            }
+        },
+        nextClick: function () {
+            next.onclick = function () {
+                if (liIndex == liLength - 1) {
+                    ul.style.marginLeft = '0px'
+                    liIndex = 0;
+                    Carousel.pointFocus();
+                } else {
+                    liIndex++;
+                    ul.style.marginLeft = -liIndex * divWidth + 'px'
+                    Carousel.pointFocus();
+                }
+            }
+        },
+        point:function(){
+            for (var i = 0; i < pointLength; i++) {
+                (function (i) {
+                    pointLi[i].onmouseover = function () {
+                        var pointIndex = i;
+                        liIndex = pointIndex;
+                        Carousel.pointFocus();
+                        ul.style.marginLeft = -liIndex * divWidth + 'px';
+
+                    }
+                })(i)
+            }
+        },
+        pointFocus:function(){
+            for (var j = 0; j < pointLength; j++) {
+                if (pointLi[j] != pointLi[liIndex]) {
+                    pointLi[j].setAttribute('class', '')
+                } else {
+                    pointLi[j].setAttribute('class', 'active')
+                }
+            }
+        }
+    };
+    Carousel.init();
+    /*var time;
+    var div = document.getElementById('warpBox');
+    var ul = document.getElementById('ulImgBox');
+    var liList = ul.getElementsByTagName('li');
+    var prev = document.getElementById('prev');
+    var next = document.getElementById('next');
+    var liIndex = 0;
+    var liLength = liList.length;
+    var divWidth = div.offsetWidth;
+    var pointUl = document.getElementById('ulPointBox');
+    var pointLi = pointUl.getElementsByTagName('li');
+    var pointLength = pointLi.length;
+    function lunBo() {
+        if (liIndex < liLength - 1) {
+            liIndex++;
+            ul.style.marginLeft = -liIndex * divWidth + 'px';
+            for (var j = 0; j < pointLength; j++) {
+                if (pointLi[j] != pointLi[liIndex]) {
+                    pointLi[j].setAttribute('class', '')
+                } else {
+                    pointLi[liIndex].setAttribute('class', 'active')
+                }
+            }
+        } else {
+            liIndex = 0;
+            ul.style.marginLeft = '0px'
+            for (var j = 0; j < pointLength; j++) {
+                if (pointLi[j] != pointLi[liIndex]) {
+                    pointLi[j].setAttribute('class', '')
+                } else {
+                    pointLi[liIndex].setAttribute('class', 'active')
+                }
+            }
+        }
+    }
+    var time = setInterval(lunBo, 2000);
+
+    ul.onmouseover = function () {
+        clearInterval(time)
+        n = 1;
+    }
+    ul.onmouseout = function () {
+        time = setInterval(lunBo, 2000);
+    }
+    prev.onmouseover = function () {
+        clearInterval(time)
+        n = 1;
+    }
+    next.onmouseout = function () {
+        time = setInterval(lunBo, 2000);
+    }
+    next.onmouseover = function () {
+        clearInterval(time)
+        n = 1;
+    }
+    prev.onmouseout = function () {
+        time = setInterval(lunBo, 2000);
+    }
+    pointUl.onmouseover = function () {
+        clearInterval(time)
+        n = 1;
+    }
+    pointUl.onmouseout = function () {
+        time = setInterval(lunBo, 2000);
+    }
+    prev.onclick = function () {
+        if (liIndex == 0) {
+            ul.style.marginLeft = -(liLength - 1) * divWidth + 'px';
+            liIndex = liLength - 1;
+            for (var j = 0; j < pointLength; j++) {
+                if (pointLi[j] != pointLi[liIndex]) {
+                    pointLi[j].setAttribute('class', '')
+                } else {
+                    pointLi[liIndex].setAttribute('class', 'active')
+                }
+            }
+        } else {
+
+            ul.style.marginLeft = -(liIndex - 1) * divWidth + 'px';
+            liIndex--;
+            for (var j = 0; j < pointLength; j++) {
+                if (pointLi[j] != pointLi[liIndex]) {
+                    pointLi[j].setAttribute('class', '')
+                } else {
+                    pointLi[liIndex].setAttribute('class', 'active')
+                }
+            }
+        }
+    }
+    next.onclick = function () {
+        if (liIndex == liLength - 1) {
+            ul.style.marginLeft = '0px'
+            liIndex = 0;
+            for (var j = 0; j < pointLength; j++) {
+                if (pointLi[j] != pointLi[liIndex]) {
+                    pointLi[j].setAttribute('class', '')
+                } else {
+                    pointLi[liIndex].setAttribute('class', 'active')
+                }
+            }
+        } else {
+            liIndex++;
+            ul.style.marginLeft = -liIndex * divWidth + 'px'
+            for (var j = 0; j < pointLength; j++) {
+                if (pointLi[j] != pointLi[liIndex]) {
+                    pointLi[j].setAttribute('class', '')
+                } else {
+                    pointLi[liIndex].setAttribute('class', 'active')
+                }
+            }
+        }
+    }
+
+    for (var i = 0; i < pointLength; i++) {
+        (function (i) {
+            pointLi[i].onmouseover = function () {
+                var pointIndex = i;
+                console.dir(pointIndex)
+                liIndex = pointIndex;
+                ul.style.marginLeft = -liIndex * divWidth + 'px';
+                for (var j = 0; j < pointLength; j++) {
+                    if (pointLi[j] != this) {
+                        pointLi[j].setAttribute('class', '')
+                    } else {
+                        this.setAttribute('class', 'active')
+                    }
+                }
+            }
+        })(i)
+    }*/
+
+</script>
